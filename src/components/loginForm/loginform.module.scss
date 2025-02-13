@@ -1,0 +1,19 @@
+.login_form{
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: auto;
+    // margin-top: 5%;
+}
+.main_box{
+    border: 1px solid black;
+    width: 40%;
+    text-align: center;
+    margin: auto;
+    margin-top: 40px;
+    height: 300px;
+}
+.form_button{
+    margin-top: 20px;
+    width: 150px;
+}
