@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import React from 'react'
 import { Link } from 'react-router-dom';
-import Login from '../login/Login';
+
 import styles from "./navbar.module.scss"
 
 const Navbar: FC  = () => {

@@ -7,13 +7,14 @@ import { Link, useNavigate } from 'react-router-dom'
 const LoginForm = () => {
   const [formData,setFormData] = React.useState({email:'',password:''});
   const navigate = useNavigate()
-  const login = useAuthStore((state:any)=>state.login)
+  const login = useAuthStore((state:any)=>state.login);
+
   const handleSubmit = ()=>{
     const storedUser = JSON.parse(localStorage.getItem("userData"));
     if (storedUser && storedUser.email === formData.email && storedUser.password === formData.password) {
       login(storedUser);
       alert("Login Successful!");
-      navigate("/"); 
+      navigate("/resource"); 
     } else {
       alert("Invalid email or password or simple create new password");
     }
