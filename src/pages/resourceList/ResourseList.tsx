@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Table, Container, Title, Loader, Center, TextInput, Button, Select } from "@mantine/core";
-import styles from './resourceList.module.scss'
+import React, { useState } from "react";
+import { Table, Container, Title, Loader, Center, TextInput, Button, Select, Pagination } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import styles from './resourceList.module.scss';
 import { Link } from "react-router-dom";
+
 // Define TypeScript Interface for API response
 interface Character {
-  url: any;
+  url: string;
   name: string;
   mass: string;
   gender: string;
@@ -12,37 +14,30 @@ interface Character {
   birth_year: string;
 }
 
+// Fetch data function for React Query
+const fetchData = async (): Promise<Character[]> => {
+  const response = await fetch("https://swapi.dev/api/people/");
+  const jsonData = await response.json();
+  return jsonData.results;
+};
+
 const ResourseList: React.FC = () => {
-  const [data, setData] = useState<Character[]>([]);
   const [searchData, setSearchData] = useState<Character[]>([]);
-  const [reset,setreset] = useState(false)
+  const [reset, setReset] = useState(false);
   const [filter, setFilter] = useState("");
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [sortOrder, setSortOrder] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(5);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://swapi.dev/api/people/");
-        const jsonData = await response.json();
-        setData(jsonData.results);
-        if(reset){
-          console.log(reset)
-          setSearchData(jsonData.results);
-        }
-        setSearchData(jsonData.results);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Use useQuery hook to fetch data
+  const { data, isLoading, error } = useQuery<Character[], Error>({
+    queryKey: ["characters"],
+    queryFn: fetchData,
+  });
 
-    fetchData();
-  }, []);
-  console.log(data)
-
-  if (loading) {
+  // Handling loading state
+  if (isLoading) {
     return (
       <Center style={{ height: "100vh" }}>
         <Loader size="xl" />
@@ -50,25 +45,48 @@ const ResourseList: React.FC = () => {
     );
   }
 
-  const handleSearch = () => {
-    let filteredResults = searchData;
+  // Handling error state
+  if (error) {
+    return (
+      <Center style={{ height: "100vh" }}>
+        <p>Error fetching data...</p>
+      </Center>
+    );
+  }
 
-    // Apply search filter (if name is entered)
+  // Filter and sorting logic
+  const handleSearch = () => {
+    let filteredResults = data || [];
+
     if (name.trim() !== "") {
       filteredResults = filteredResults.filter((item) =>
         item.name.toLowerCase().includes(name.toLowerCase())
       );
     }
 
-    // Apply gender filter (if selected)
     if (filter && filter !== "All") {
       filteredResults = filteredResults.filter(
         (item) => item.gender.toLowerCase() === filter.toLowerCase()
       );
     }
 
-    setData(filteredResults);
+    if (sortOrder) {
+      filteredResults = filteredResults.sort((a, b) => {
+        const massA = isNaN(parseFloat(a.mass)) ? 0 : parseFloat(a.mass);
+        const massB = isNaN(parseFloat(b.mass)) ? 0 : parseFloat(b.mass);
+
+        return sortOrder === "High to Low" ? massB - massA : massA - massB;
+      });
+    }
+
+    setSearchData(filteredResults);
   };
+
+  // Pagination logic
+  const currentData = (searchData.length > 0 ? searchData : data).slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <>
@@ -83,68 +101,79 @@ const ResourseList: React.FC = () => {
         {/* Dropdown Filter */}
         <Select
           placeholder="Filter By Gender"
-          data={["All", "Male", "Female"]}
+          data={["All", "Male", "Female", "n/a"]}
           value={filter}
-          onChange={(value) => setFilter(value || "")} 
+          onChange={(value) => setFilter(value || "")}
         />
+
+        {/* Dropdown for Sorting by Mass */}
         <Select
-          placeholder="Sort By Ascending"
-          data={["All", "Male", "Female"]}
-          value={filter}
-          onChange={(value) => setFilter(value || "")} 
+          placeholder="Sort by Mass"
+          data={["", "Low to High", "High to Low"]}
+          value={sortOrder}
+          onChange={(value) => setSortOrder(value || "")}
         />
-      <Button onClick={()=>handleSearch()}>Search</Button>
-      <Button onClick={()=>setreset(true)}>Reset</Button>
-    </div>
-    <Container size="md" mt={20}>
-      <Title align="center" order={2} mb={20}>
-        Star Wars Characters
-      </Title>
 
-      <Table
-        striped
-        highlightOnHover
-        withBorder
-        withColumnBorders
-        style={{ borderRadius: "10px", overflow: "hidden" }}
-      >
-        <thead style={{ backgroundColor: "#f4f4f4" }}>
-          <tr>
-            <th style={{ padding: "10px", textAlign: "left" }}>Name</th>
-            <th style={{ padding: "10px", textAlign: "left" }}>Mass</th>
-            <th style={{ padding: "10px", textAlign: "left" }}>Gender</th>
-            <th style={{ padding: "10px", textAlign: "left" }}>Skin Color</th>
-            <th style={{ padding: "10px", textAlign: "left" }}>Birth Year</th>
-            <th style={{ padding: "10px", textAlign: "left" }}>More Details</th>
-          </tr>
-        </thead>
-        <tbody>
-  {data.map((character: Character,index:string) => {
-    // Extract correct ID from the API URL
-    const id = character.url.split("/").filter(Boolean).pop();
+        <Button onClick={() => handleSearch()}>Search</Button>
+        <Button onClick={() => setReset(true)}>Reset</Button>
+      </div>
 
-    return (
-      <tr
-        key={character.name}
-        style={{
-          backgroundColor: parseInt(id) % 2 === 0 ? "#f9f9f9" : "white",
-        }}
-      >
-        <td style={{ padding: "10px" }}>{character.name}</td>
-        <td style={{ padding: "10px" }}>{character.mass}</td>
-        <td style={{ padding: "10px" }}>{character.gender}</td>
-        <td style={{ padding: "10px" }}>{character.skin_color}</td>
-        <td style={{ padding: "10px" }}>{character.birth_year}</td>
-        <td style={{ padding: "10px" }}>
-          <Link to={`/resource/${index+1}`}>View More</Link>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
+      <Container size="md" mt={20}>
+        <Title align="center" order={2} mb={20}>
+          Star Wars Characters
+        </Title>
 
-      </Table>
-    </Container>
+        <Table
+          striped
+          highlightOnHover
+          withBorder
+          withColumnBorders
+          style={{ borderRadius: "10px", overflow: "hidden" }}
+        >
+          <thead style={{ backgroundColor: "#f4f4f4" }}>
+            <tr>
+              <th style={{ padding: "10px", textAlign: "left" }}>Name</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Mass</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Gender</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Skin Color</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Birth Year</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>More Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentData.map((character, index) => {
+              const id = character.url.split("/").filter(Boolean).pop();
+
+              return (
+                <tr
+                  key={character.name}
+                  style={{
+                    backgroundColor: parseInt(id) % 2 === 0 ? "#f9f9f9" : "white",
+                  }}
+                >
+                  <td style={{ padding: "10px" }}>{character.name}</td>
+                  <td style={{ padding: "10px" }}>{character.mass}</td>
+                  <td style={{ padding: "10px" }}>{character.gender}</td>
+                  <td style={{ padding: "10px" }}>{character.skin_color}</td>
+                  <td style={{ padding: "10px" }}>{character.birth_year}</td>
+                  <td style={{ padding: "10px" }}>
+                    <Link to={`/resource/${index + 1}`}>View More</Link>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+
+        {/* Pagination Component */}
+        <Pagination
+          page={currentPage}
+          onChange={setCurrentPage}
+          total={Math.ceil((searchData.length > 0 ? searchData : data).length / itemsPerPage)}
+          size="md"
+          color="blue"
+        />
+      </Container>
     </>
   );
 };

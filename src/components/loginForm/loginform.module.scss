@@ -17,3 +17,68 @@
     margin-top: 20px;
     width: 150px;
 }
+.auth_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+}
+
+.auth_box {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+}
+
+.auth_box h2 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.auth_box input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.auth_box button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.auth_box button:hover {
+    background-color: #0056b3;
+}
+
+.auth_box p {
+    margin-top: 1rem;
+}
+
+.auth_box a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.auth_box a:hover {
+    text-decoration: underline;
+}
+
+.notification_wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}

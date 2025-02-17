@@ -1,43 +1,59 @@
-import React from 'react'
-import styles from './loginform.module.scss'
-import { Button, TextInput } from '@mantine/core'
-import useAuthStore from '../../store/authStore'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect } from 'react';
+import { Button, TextInput, Notification } from '@mantine/core';
+import useAuthStore from '../../store/authStore';
+import { Link, useNavigate } from 'react-router-dom';
+import styles from './loginform.module.scss';
 
 const LoginForm = () => {
-  const [formData,setFormData] = React.useState({email:'',password:''});
-  const navigate = useNavigate()
-  const login = useAuthStore((state:any)=>state.login);
+  const [formData, setFormData] = React.useState({ email: '', password: '' });
+  const [notification, setNotification] = React.useState(null);
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuthStore();
 
-  const handleSubmit = ()=>{
-    const storedUser = JSON.parse(localStorage.getItem("userData"));
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/resource');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = () => {
+    const storedUser = JSON.parse(localStorage.getItem('userData'));
     if (storedUser && storedUser.email === formData.email && storedUser.password === formData.password) {
       login(storedUser);
-      alert("Login Successful!");
-      navigate("/resource"); 
+      localStorage.setItem('auth', 'true');
+      setNotification({ message: 'Login Successful!', color: 'green' });
+      setTimeout(() => navigate('/resource'), 1000);
     } else {
-      alert("Invalid email or password or simple create new password");
+      setNotification({ message: 'Invalid email or password. Please try again.', color: 'red' });
     }
-  }
+  };
 
-  const handleChangeData = (e: { target: { name: any; value: any; }; }) => {
+  const handleChangeData = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
-  return (
-    <div className={styles.main_box} >
-      <h2>Login</h2>
-    <div className={styles.login_form}>
-            <TextInput placeholder='Enter email' name='email' value={formData.email} onChange={handleChangeData}/>
-            <TextInput placeholder='Enter password' name='password'  onChange={handleChangeData} value={formData.password}/>
-            <Button className={styles.form_button} onClick={handleSubmit}>Login</Button>
-            <p>Or don't have account <Link to='/signup'>Sign Up </Link></p>
-            </div>
-            </div>
-  )
-}
 
-export default LoginForm
+  return (
+    <div className={styles.auth_container}>
+      {notification && (
+        <div className={styles.notification_wrapper}>
+          <Notification color={notification.color} onClose={() => setNotification(null)}>
+            {notification.message}
+          </Notification>
+        </div>
+      )}
+      <div className={styles.auth_box}>
+        <h2>Login</h2>
+        <TextInput placeholder='Enter email' name='email' value={formData.email} onChange={handleChangeData} />
+        <TextInput placeholder='Enter password' name='password' type='password' onChange={handleChangeData} value={formData.password} />
+        <Button className={styles.form_button} onClick={handleSubmit}>Login</Button>
+        <p>Or don't have an account? <Link to='/signup'>Sign Up</Link></p>
+      </div>
+    </div>
+  );
+};
+
+export default LoginForm;
