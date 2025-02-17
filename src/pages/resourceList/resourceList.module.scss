@@ -1,20 +1,52 @@
 .search_box {
-    display: flex;
-    width: 60%;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    align-items: center;
-  }
-  
-  .search_box input,
-  .search_box button,
-  .search_box select {
-    margin-right: 10px;
-  }
-  
-  .pagination {
-    margin-top: 20px;
-    display: flex;
+  display: flex;
+  width: 60%;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  align-items: center;
+  // flex-wrap: wrap;
+}
+
+.search_box input,
+.search_box button,
+.search_box select {
+  margin-bottom: 10px; 
+  width: 100%;
+}
+
+.search_box input,
+.search_box button,
+.search_box select {
+  margin-right: 10px;
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  .search_box {
     justify-content: center;
   }
-  
+
+  .search_box input,
+  .search_box select,
+  .search_box button {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    width: 100%;
+    padding: 0 10px;
+  }
+}
+
+.container {
+  padding: 0 20px;
+}

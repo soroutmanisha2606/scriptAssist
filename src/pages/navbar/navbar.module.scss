@@ -3,8 +3,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: transparent; /* Removed background color */
-  color: #000; /* Black text color */
+  background-color: transparent;
+  color: #000;
   font-family: 'Arial', sans-serif;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 10px;
@@ -14,7 +14,7 @@
   font-size: 24px;
   font-weight: bold;
   margin: 0;
-  color: #000; /* Black color for logo text */
+  color: #000;
 }
 
 .links {
@@ -27,11 +27,11 @@
   margin: 0;
   font-size: 16px;
   font-weight: 500;
-  color: #000; /* Black color for text */
+  color: #000;
 }
 
 .link {
-  color: #000; /* Black color for links */
+  color: #000;
   font-size: 16px;
   text-decoration: none;
   font-weight: 600;
@@ -45,7 +45,7 @@
 button {
   background: none;
   border: none;
-  color: #000; /* Black color for button text */
+  color: #000;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -55,8 +55,8 @@ button {
 
 button:hover {
   text-decoration: underline;
-  color: #3498db; /* Highlight color on hover */
-  background-color: #dfe6e9; /* Very light grayish background on hover */
+  color: #3498db;
+  background-color: #dfe6e9;
 }
 
 @media screen and (max-width: 768px) {

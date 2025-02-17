@@ -10,12 +10,11 @@ const Navbar: FC = () => {
   const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
-    // Check if user data exists in localStorage to determine login status
     const storedUserData = localStorage.getItem('userData');
     if (storedUserData) {
-      const user = JSON.parse(storedUserData); // Parse user data from localStorage
+      const user = JSON.parse(storedUserData); 
       setIsLoggedIn(true);
-      setUserName(user.name); // Set the username
+      setUserName(user.name);
     } else {
       setIsLoggedIn(false);
     }
